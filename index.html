@@ -1,44 +1,664 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Website</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: Black;
-            font-family: Arial, sans-serif;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wiki — Java · Linux · Minecraft</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap');
 
-        h1 {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #ffffff;
-            font-size: 2.5em;
-            text-align: center;
-            opacity: 0;
-            animation: apparition 1.2s ease-out forwards;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
-            text-decoration: underline;
-        }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        @keyframes apparition {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-    </style>
+    :root {
+      --bg: #0d0d0d;
+      --fg: #f0ece4;
+      --accent: #c8b89a;
+      --muted: #4a4540;
+      --dim: #1a1815;
+      --card: #111010;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Mono', 'Courier New', monospace;
+      overflow-x: hidden;
+    }
+
+    /* Grain */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 100;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: linear-gradient(to bottom, rgba(13,13,13,0.97) 0%, transparent 100%);
+      backdrop-filter: blur(2px);
+    }
+    .nav-logo {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.5rem; color: var(--fg); text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .nav-links { display: flex; gap: 2.5rem; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 6rem 2rem 4rem;
+      position: relative;
+    }
+    .hero-glow {
+      position: absolute; width: 800px; height: 800px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,184,154,0.05) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: glowPulse 8s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes glowPulse {
+      0%,100% { opacity:0.5; transform:translate(-50%,-50%) scale(1); }
+      50% { opacity:1; transform:translate(-50%,-50%) scale(1.08); }
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      line-height: 1; letter-spacing: -0.03em;
+      color: var(--fg); margin-bottom: 1.5rem;
+      animation: fadeUp 1.2s ease forwards;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-sub {
+      font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 3rem;
+      animation: fadeUp 1.2s ease 0.2s both;
+    }
+    .hero-nav {
+      display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 1.2s ease 0.4s both;
+    }
+    .hero-nav a {
+      border: 1px solid var(--muted); color: var(--accent);
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      padding: 0.6rem 1.4rem; text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .hero-nav a:hover {
+      border-color: var(--accent); color: var(--fg);
+      box-shadow: 0 0 20px rgba(200,184,154,0.1);
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── SECTION ── */
+    section {
+      max-width: 1100px; margin: 0 auto;
+      padding: 7rem 2rem;
+    }
+    .section-label {
+      font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--muted); opacity: 0.3;
+    }
+    .section-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      letter-spacing: -0.02em; line-height: 1;
+      color: var(--fg); margin-bottom: 0.5rem;
+    }
+    .section-title em { font-style: italic; color: var(--accent); }
+    .section-intro {
+      font-size: 0.8rem; color: var(--accent); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 4rem;
+    }
+    .divider {
+      width: 40px; height: 1px; background: var(--accent);
+      margin: 2rem 0; opacity: 0.5;
+    }
+
+    /* ── HERO IMAGE ── */
+    .img-hero {
+      width: 100%; aspect-ratio: 16/7; object-fit: cover;
+      filter: grayscale(30%) brightness(0.85);
+      margin-bottom: 4rem;
+      border: 1px solid var(--muted);
+      display: block;
+    }
+
+    /* ── CONTENT GRID ── */
+    .content-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+      margin-bottom: 5rem;
+    }
+    @media(max-width: 700px) { .content-grid { grid-template-columns: 1fr; } }
+
+    .content-block h3 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.5rem; color: var(--fg); margin-bottom: 1rem;
+    }
+    .content-block p {
+      font-size: 0.78rem; line-height: 2; color: #a09880;
+      font-weight: 300;
+    }
+    .content-block p + p { margin-top: 1rem; }
+
+    /* ── FEATURE LIST ── */
+    .feature-list {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px; background: var(--muted); border: 1px solid var(--muted);
+      margin-bottom: 5rem;
+    }
+    .feature-item {
+      background: var(--card); padding: 2rem 1.5rem;
+      transition: background 0.2s;
+    }
+    .feature-item:hover { background: #161412; }
+    .feature-item .fi-label {
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.6rem;
+    }
+    .feature-item .fi-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.1rem; color: var(--fg); margin-bottom: 0.5rem;
+    }
+    .feature-item .fi-desc {
+      font-size: 0.72rem; line-height: 1.8; color: #7a6e60; font-weight: 300;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: #0a0908; border: 1px solid var(--muted);
+      padding: 2rem; margin-bottom: 4rem; overflow-x: auto;
+    }
+    .code-block pre {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 0.75rem; line-height: 1.9; color: #9a8c78;
+    }
+    .code-block pre .kw { color: #c8b89a; }
+    .code-block pre .str { color: #7a9e7e; }
+    .code-block pre .cm { color: #4a4540; font-style: italic; }
+    .code-block pre .fn { color: #a8c4d4; }
+
+    /* ── IMAGE GRID ── */
+    .img-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 1px;
+      background: var(--muted); margin-bottom: 5rem;
+    }
+    .img-grid img {
+      width: 100%; height: 280px; object-fit: cover;
+      filter: brightness(0.8) grayscale(20%);
+      display: block;
+      transition: filter 0.3s;
+    }
+    .img-grid img:hover { filter: brightness(0.95) grayscale(0%); }
+    @media(max-width:600px) { .img-grid { grid-template-columns: 1fr; } }
+
+    /* ── STAT ROW ── */
+    .stat-row {
+      display: flex; gap: 3rem; flex-wrap: wrap;
+      border-top: 1px solid rgba(74,69,64,0.4);
+      border-bottom: 1px solid rgba(74,69,64,0.4);
+      padding: 2.5rem 0; margin-bottom: 5rem;
+    }
+    .stat { flex: 1; min-width: 120px; }
+    .stat .num {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 2.5rem; color: var(--fg); display: block;
+    }
+    .stat .lbl {
+      font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── TIMELINE ── */
+    .timeline { margin-bottom: 5rem; }
+    .tl-item {
+      display: grid; grid-template-columns: 80px 1fr;
+      gap: 2rem; padding: 1.5rem 0;
+      border-bottom: 1px solid rgba(74,69,64,0.25);
+    }
+    .tl-year {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.1rem; color: var(--accent); padding-top: 0.2rem;
+    }
+    .tl-content h4 { font-size: 0.85rem; color: var(--fg); margin-bottom: 0.3rem; letter-spacing: 0.05em; }
+    .tl-content p { font-size: 0.72rem; color: #7a6e60; line-height: 1.8; font-weight: 300; }
+
+    /* ── QUOTE ── */
+    .quote-block {
+      border-left: 2px solid var(--accent);
+      padding: 1.5rem 2rem; margin-bottom: 4rem;
+      background: rgba(200,184,154,0.03);
+    }
+    .quote-block p {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-style: italic; font-size: 1.2rem;
+      color: var(--fg); line-height: 1.6; margin-bottom: 0.5rem;
+    }
+    .quote-block cite {
+      font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── SEPARATOR ── */
+    .section-sep {
+      max-width: 1100px; margin: 0 auto;
+      height: 1px; background: linear-gradient(to right, transparent, var(--muted), transparent);
+      opacity: 0.4;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 4rem 2rem;
+      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
 </head>
 <body>
 
-    <h1>Bienvenue à toi ✨</h1>
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">...</a>
+  <div class="nav-links">
+    <a href="#java">Java</a>
+    <a href="#linux">Linux</a>
+    <a href="#minecraft">Minecraft</a>
+  </div>
+</nav>
 
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <p class="hero-sub">Documentation — Version 1.0</p>
+  <h1>Java · <em>Linux</em><br>Minecraft</h1>
+  <p class="hero-sub">Trois piliers du monde numérique, explorés en profondeur.</p>
+  <div class="hero-nav">
+    <a href="#java">Explorer Java</a>
+    <a href="#linux">Explorer Linux</a>
+    <a href="#minecraft">Explorer Minecraft</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ JAVA ══════════════════════════════════════════ -->
+<section id="java">
+  <div class="reveal">
+    <p class="section-label">01 — Langage</p>
+    <h2 class="section-title">Java</h2>
+    <p class="section-intro">Write Once, Run Anywhere — depuis 1995</p>
+  </div>
+
+  <img class="img-hero reveal"
+    src="https://upload.wikimedia.org/wikipedia/en/3/30/Java_programming_language_logo.svg"
+    alt="Java Logo"
+    style="object-fit:contain; background:#0a0908; padding:3rem; height:300px; width:100%;">
+
+  <div class="content-grid reveal">
+    <div class="content-block">
+      <h3>Qu'est-ce que Java ?</h3>
+      <p>Java est un langage de programmation orienté objet, statiquement typé, créé par James Gosling chez Sun Microsystems en 1995. Sa philosophie fondatrice — <em>"Write Once, Run Anywhere"</em> — repose sur la Java Virtual Machine (JVM), qui permet à un même bytecode compilé de s'exécuter sur n'importe quelle plateforme sans recompilation.</p>
+      <p>Aujourd'hui maintenu par Oracle, Java reste l'un des langages les plus utilisés au monde, présent dans les applications d'entreprise, Android, les systèmes embarqués et les serveurs web à haute disponibilité.</p>
+    </div>
+    <div class="content-block">
+      <h3>Architecture & JVM</h3>
+      <p>Le code source Java (.java) est compilé en bytecode (.class) par le compilateur javac. Ce bytecode est ensuite interprété et optimisé par la JVM via le JIT compiler (Just-In-Time), qui le traduit en instructions machine natives au moment de l'exécution. Ce mécanisme garantit performances et portabilité simultanées.</p>
+      <p>La JVM gère également la mémoire via un Garbage Collector automatique, libérant le développeur de la gestion manuelle des allocations — contrairement au C ou C++.</p>
+    </div>
+  </div>
+
+  <div class="stat-row reveal">
+    <div class="stat"><span class="num">1995</span><span class="lbl">Année de création</span></div>
+    <div class="stat"><span class="num">3B+</span><span class="lbl">Appareils utilisant Java</span></div>
+    <div class="stat"><span class="num">#1</span><span class="lbl">Langage entreprise</span></div>
+    <div class="stat"><span class="num">21 LTS</span><span class="lbl">Dernière version stable</span></div>
+  </div>
+
+  <div class="reveal">
+    <h3 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--fg);margin-bottom:1.5rem;">Exemple de code</h3>
+    <div class="code-block">
+      <pre><span class="cm">// Exemple Java — Polymorphisme & Héritage</span>
+<span class="kw">public abstract class</span> <span class="fn">Animal</span> {
+    <span class="kw">protected</span> String name;
+
+    <span class="kw">public</span> <span class="fn">Animal</span>(String name) {
+        <span class="kw">this</span>.name = name;
+    }
+
+    <span class="kw">public abstract</span> <span class="fn">String</span> <span class="fn">speak</span>();
+
+    @Override
+    <span class="kw">public</span> String <span class="fn">toString</span>() {
+        <span class="kw">return</span> name + <span class="str">" dit : "</span> + <span class="fn">speak</span>();
+    }
+}
+
+<span class="kw">public class</span> <span class="fn">Dog</span> <span class="kw">extends</span> <span class="fn">Animal</span> {
+    <span class="kw">public</span> <span class="fn">Dog</span>(String name) { <span class="kw">super</span>(name); }
+
+    @Override
+    <span class="kw">public</span> String <span class="fn">speak</span>() { <span class="kw">return</span> <span class="str">"Woof!"</span>; }
+}
+
+<span class="kw">public class</span> <span class="fn">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        List&lt;Animal&gt; animals = List.<span class="fn">of</span>(<span class="kw">new</span> <span class="fn">Dog</span>(<span class="str">"Rex"</span>));
+        animals.<span class="fn">forEach</span>(System.out::<span class="fn">println</span>);
+    }
+}</pre>
+    </div>
+  </div>
+
+  <div class="feature-list reveal">
+    <div class="feature-item">
+      <div class="fi-label">Paradigme</div>
+      <div class="fi-title">Orienté Objet</div>
+      <div class="fi-desc">Tout en Java est un objet. Encapsulation, héritage et polymorphisme sont au cœur du langage, favorisant la réutilisabilité du code.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Mémoire</div>
+      <div class="fi-title">Garbage Collector</div>
+      <div class="fi-desc">La JVM gère automatiquement l'allocation et la libération de mémoire via différents algorithmes GC : G1, ZGC, Shenandoah.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Concurrence</div>
+      <div class="fi-title">Threads & Virtual Threads</div>
+      <div class="fi-desc">Java supporte la programmation concurrente native. Java 21 introduit les Virtual Threads (Project Loom) pour une scalabilité massive.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Écosystème</div>
+      <div class="fi-title">Maven & Spring</div>
+      <div class="fi-desc">Un écosystème immense : Spring Boot, Hibernate, Maven, Gradle, Jakarta EE — Java domine le développement backend d'entreprise.</div>
+    </div>
+  </div>
+
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="tl-year">1995</div>
+      <div class="tl-content"><h4>Naissance de Java</h4><p>Sun Microsystems publie Java 1.0. Le langage est initialement conçu pour les appareils embarqués sous le nom de "Oak".</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2004</div>
+      <div class="tl-content"><h4>Java 5 — Generics & Annotations</h4><p>Introduction des Generics, des annotations, de l'autoboxing et du for-each loop. Une révolution pour la type-safety.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2014</div>
+      <div class="tl-content"><h4>Java 8 — Lambdas & Streams</h4><p>L'une des mises à jour les plus significatives : introduction des lambdas, de l'API Stream, et des interfaces fonctionnelles.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2023</div>
+      <div class="tl-content"><h4>Java 21 LTS — Virtual Threads</h4><p>Project Loom devient stable. Les Virtual Threads permettent de gérer des millions de threads légers sans surcharge mémoire.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════ LINUX ══════════════════════════════════════════ -->
+<section id="linux">
+  <div class="reveal">
+    <p class="section-label">02 — Système d'exploitation</p>
+    <h2 class="section-title"><em>Linux</em></h2>
+    <p class="section-intro">Le noyau qui fait tourner le monde — depuis 1991</p>
+  </div>
+
+  <img class="img-hero reveal"
+    src="https://upload.wikimedia.org/wikipedia/commons/a/af/Tux.png"
+    alt="Tux Linux"
+    style="object-fit:contain; background:#0a0908; padding:3rem; height:300px; width:100%;">
+
+  <div class="content-grid reveal">
+    <div class="content-block">
+      <h3>Qu'est-ce que Linux ?</h3>
+      <p>Linux est un noyau (kernel) de système d'exploitation open-source créé par Linus Torvalds en 1991, alors étudiant à l'Université d'Helsinki. Inspiré de MINIX et UNIX, Linux a rapidement évolué grâce à une communauté mondiale de contributeurs pour devenir le système d'exploitation dominant dans les serveurs, les supercalculateurs, les smartphones (via Android) et l'embarqué.</p>
+      <p>Techniquement, "Linux" désigne uniquement le noyau. Les distributions complètes — Ubuntu, Debian, Arch, Fedora — combinent le noyau Linux avec des outils GNU, un gestionnaire de paquets et un environnement de bureau.</p>
+    </div>
+    <div class="content-block">
+      <h3>Architecture du noyau</h3>
+      <p>Le noyau Linux est de type monolithique modulaire : il tourne en espace kernel et gère directement le matériel. Il est composé de sous-systèmes : gestion des processus (scheduler), système de fichiers virtuel (VFS), pile réseau TCP/IP, gestion mémoire (VMM), et pilotes de périphériques.</p>
+      <p>Sa modularité permet de charger et décharger des modules (.ko) à chaud sans redémarrage, via les commandes insmod, rmmod et modprobe. Le noyau est écrit à 97% en C et 3% en Assembly.</p>
+    </div>
+  </div>
+
+  <div class="stat-row reveal">
+    <div class="stat"><span class="num">1991</span><span class="lbl">Première version</span></div>
+    <div class="stat"><span class="num">96%</span><span class="lbl">Des serveurs web mondiaux</span></div>
+    <div class="stat"><span class="num">500+</span><span class="lbl">Distributions existantes</span></div>
+    <div class="stat"><span class="num">30M+</span><span class="lbl">Lignes de code noyau</span></div>
+  </div>
+
+  <div class="quote-block reveal">
+    <p>"Je fais un système d'exploitation (gratuit). C'est juste un hobby, ça ne sera pas grand chose ni professionnel..."</p>
+    <cite>— Linus Torvalds, message Usenet, 25 août 1991</cite>
+  </div>
+
+  <div class="reveal">
+    <h3 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--fg);margin-bottom:1.5rem;">Commandes essentielles</h3>
+    <div class="code-block">
+      <pre><span class="cm"># Navigation et fichiers</span>
+<span class="kw">ls</span> -la                    <span class="cm"># Lister avec permissions</span>
+<span class="kw">find</span> / -name <span class="str">"*.conf"</span> 2>/dev/null  <span class="cm"># Rechercher des fichiers</span>
+<span class="kw">grep</span> -r <span class="str">"pattern"</span> ./     <span class="cm"># Recherche récursive</span>
+
+<span class="cm"># Processus et système</span>
+<span class="kw">top</span> / <span class="kw">htop</span>               <span class="cm"># Moniteur de processus</span>
+<span class="kw">ps</span> aux | grep process     <span class="cm"># Lister les processus</span>
+<span class="kw">kill</span> -9 PID              <span class="cm"># Forcer la terminaison</span>
+<span class="kw">systemctl</span> status nginx    <span class="cm"># Gérer les services</span>
+
+<span class="cm"># Réseau</span>
+<span class="kw">ip</span> addr show              <span class="cm"># Interfaces réseau</span>
+<span class="kw">ss</span> -tulnp                 <span class="cm"># Ports ouverts</span>
+<span class="kw">curl</span> -I https://example.com  <span class="cm"># Headers HTTP</span>
+
+<span class="cm"># Permissions</span>
+<span class="kw">chmod</span> 755 script.sh       <span class="cm"># rwxr-xr-x</span>
+<span class="kw">chown</span> user:group file     <span class="cm"># Changer propriétaire</span></pre>
+    </div>
+  </div>
+
+  <div class="feature-list reveal">
+    <div class="feature-item">
+      <div class="fi-label">Licence</div>
+      <div class="fi-title">GPL v2 Open Source</div>
+      <div class="fi-desc">Linux est publié sous licence GPLv2. Tout code dérivé doit rester open-source, garantissant la liberté du logiciel.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Sécurité</div>
+      <div class="fi-title">SELinux & AppArmor</div>
+      <div class="fi-desc">Linux implémente le contrôle d'accès obligatoire (MAC), les namespaces, cgroups et capabilities pour isoler les processus.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Systèmes de fichiers</div>
+      <div class="fi-title">ext4, Btrfs, ZFS</div>
+      <div class="fi-desc">Linux supporte des dizaines de systèmes de fichiers. Btrfs et ZFS offrent snapshots, compression et RAID intégrés.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Conteneurs</div>
+      <div class="fi-title">Docker & Kubernetes</div>
+      <div class="fi-desc">Namespaces et cgroups Linux sont la fondation de Docker. Kubernetes orchestre des milliers de conteneurs Linux en production.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Scheduler</div>
+      <div class="fi-title">CFS — Completely Fair</div>
+      <div class="fi-desc">Le scheduler CFS utilise un arbre rouge-noir pour distribuer équitablement le CPU entre les processus selon leur priorité nice.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Déploiement</div>
+      <div class="fi-title">Cloud & Embarqué</div>
+      <div class="fi-desc">AWS, GCP, Azure — tous tournent Linux. Il équipe aussi les routeurs, téléviseurs, voitures et satellites.</div>
+    </div>
+  </div>
+
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="tl-year">1991</div>
+      <div class="tl-content"><h4>Linux 0.01</h4><p>Linus Torvalds publie le premier noyau Linux, 10 000 lignes de code. Il tourne uniquement sur x86.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1994</div>
+      <div class="tl-content"><h4>Linux 1.0</h4><p>Première version stable officielle. Support réseau TCP/IP intégré. La communauté open-source explose.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2003</div>
+      <div class="tl-content"><h4>Linux 2.6 — Révolution</h4><p>Support complet SMP, nouveau scheduler, support des threads NPTL, ALSA pour le son. Adoption massive en entreprise.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2011</div>
+      <div class="tl-content"><h4>Android & Linux</h4><p>Android (basé sur Linux) atteint 50% du marché mobile. Linux devient le noyau le plus utilisé au monde.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2024</div>
+      <div class="tl-content"><h4>Linux 6.x — Rust intégré</h4><p>Le langage Rust est officiellement supporté pour écrire des modules kernel, apportant memory-safety sans GC.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════ MINECRAFT ══════════════════════════════════════════ -->
+<section id="minecraft">
+  <div class="reveal">
+    <p class="section-label">03 — Jeu vidéo</p>
+    <h2 class="section-title">Mine<em>craft</em></h2>
+    <p class="section-intro">Le jeu le plus vendu de l'histoire — depuis 2009</p>
+  </div>
+
+  <img class="img-hero reveal"
+    src="https://upload.wikimedia.org/wikipedia/commons/4/4d/W3sifileExtension%22%3A%22jpg%22%2C%22imageQuality%22%3A85%2C%22imageSize%22%3A%22large%22%7D/minecraft-hero-lava.jpg"
+    alt="Minecraft landscape"
+    onerror="this.src='https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png';this.style.objectFit='contain';this.style.padding='3rem';this.style.background='#0a0908';">
+
+  <div class="content-grid reveal">
+    <div class="content-block">
+      <h3>Qu'est-ce que Minecraft ?</h3>
+      <p>Minecraft est un jeu vidéo de type "sandbox" développé à l'origine par Markus "Notch" Persson en Java, et lancé en version alpha en 2009. Racheté par Microsoft en 2014 pour 2,5 milliards de dollars, il est aujourd'hui développé par Mojang Studios. Avec plus de 300 millions de copies vendues, c'est le jeu le plus vendu de tous les temps, tous supports confondus.</p>
+      <p>Le monde de Minecraft est généré procéduralement à partir d'un "seed" — une graine numérique. Il est composé de chunks de 16×16×384 blocs, formant un monde théoriquement infini (environ 60 millions de km² de surface explorable).</p>
+    </div>
+    <div class="content-block">
+      <h3>Technique & Moteur</h3>
+      <p>Initialement entièrement écrit en Java, Minecraft Java Edition reste la version de référence pour le modding et les serveurs. La version Bedrock Edition (C++) est multiplateforme (mobile, consoles, Windows). Le moteur maison gère le rendu de chunks, l'éclairage dynamique, les entités, la physique des fluides et les pistons.</p>
+      <p>Depuis la version 1.17, le moteur de rendu a été partiellement réécrit. Iris Shaders et Sodium (mods communautaires) permettent d'activer des shaders GLSL avancés, transformant radicalement le rendu visuel du jeu.</p>
+    </div>
+  </div>
+
+  <div class="stat-row reveal">
+    <div class="stat"><span class="num">300M+</span><span class="lbl">Copies vendues</span></div>
+    <div class="stat"><span class="num">2.5B$</span><span class="lbl">Rachat par Microsoft</span></div>
+    <div class="stat"><span class="num">140M</span><span class="lbl">Joueurs actifs mensuels</span></div>
+    <div class="stat"><span class="num">∞</span><span class="lbl">Taille du monde</span></div>
+  </div>
+
+  <div class="img-grid reveal">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Minecraft_Village.png" alt="Minecraft village" onerror="this.style.display='none'">
+    <img src="https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png" alt="Minecraft cover" style="object-fit:contain;background:#0a0908;padding:1rem;">
+  </div>
+
+  <div class="feature-list reveal">
+    <div class="feature-item">
+      <div class="fi-label">Génération</div>
+      <div class="fi-title">Procédurale & Seeds</div>
+      <div class="fi-desc">Le monde est généré via du bruit de Perlin et Simplex. Chaque "seed" produit un monde unique : biomes, grottes, structures.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Redstone</div>
+      <div class="fi-title">Circuits Logiques</div>
+      <div class="fi-desc">La redstone simule des circuits électriques. Des joueurs ont construit des CPUs fonctionnels, des écrans, et même des IA dans Minecraft.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Modding</div>
+      <div class="fi-title">Forge & Fabric</div>
+      <div class="fi-desc">Des milliers de mods modifient ou étendent le jeu. Forge et Fabric sont les deux principaux loaders. L'API est en Java/Kotlin.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Serveurs</div>
+      <div class="fi-title">Bukkit, Paper, Spigot</div>
+      <div class="fi-desc">Des serveurs multijoueurs accueillent des milliers de joueurs simultanément. Hypixel, le plus grand, dépasse 100 000 joueurs en pic.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Éducation</div>
+      <div class="fi-title">Minecraft Education</div>
+      <div class="fi-desc">Microsoft propose Minecraft Education Edition utilisé dans plus de 115 pays pour enseigner les mathématiques, la chimie et le code.</div>
+    </div>
+    <div class="feature-item">
+      <div class="fi-label">Speedrun</div>
+      <div class="fi-title">Any% & Glitches</div>
+      <div class="fi-desc">La communauté speedrun de Minecraft est immense. Le record Any% RSG tourne autour de 7-8 minutes grâce à des manipulations de seeds.</div>
+    </div>
+  </div>
+
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="tl-year">2009</div>
+      <div class="tl-content"><h4>Alpha publique</h4><p>Notch publie la première version de "Cave Game", renommée Minecraft. Le jeu se vend à 1 000 copies le premier jour.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2011</div>
+      <div class="tl-content"><h4>Version 1.0 officielle</h4><p>Minecraft est officiellement lancé à la MineCon 2011. Le Nether, l'Ender Dragon et les enchantements font leur apparition.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2014</div>
+      <div class="tl-content"><h4>Rachat par Microsoft</h4><p>Microsoft acquiert Mojang pour 2,5 milliards de dollars. Notch quitte l'entreprise. La Bedrock Edition est développée en C++.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2020</div>
+      <div class="tl-content"><h4>Nether Update & 200M copies</h4><p>La mise à jour Nether révolutionne la dimension infernale. Minecraft atteint 200 millions de copies vendues pendant la pandémie.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2024</div>
+      <div class="tl-content"><h4>300M copies — Trails & Tales</h4><p>Minecraft devient officiellement le jeu le plus vendu de l'histoire. La communauté reste l'une des plus actives au monde.</p></div>
+    </div>
+  </div>
+
+  <div class="quote-block reveal">
+    <p>"Minecraft n'est pas seulement un jeu. C'est un outil créatif, une plateforme éducative, et un monde social — tout à la fois."</p>
+    <cite>— Mojang Studios</cite>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>— Java · Linux · Minecraft —</p>
+  <p style="margin-top:0.5rem;opacity:0.4;">Documentation non officielle — Contenu à titre informatif</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
